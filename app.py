@@ -1,11 +1,29 @@
 from flask import Flask, request, jsonify, render_template
 from tensorflow.keras.models import load_model
 import numpy as np
+import requests
+import os
 
 app = Flask(__name__)
 
+# URL of the hosted model file
+MODEL_URL = "https://drive.google.com/uc?export=download&id=1qUkxkPapJEohXFcImb7DFbsmLJnHn-7N"
 
-model = load_model("C:\\Users\\drban\\OneDrive\\Desktop\\python\\python.h5")
+
+# Local path where the model will be saved and loaded
+model_path = "python.h5"
+
+# Check if the model file exists locally; if not, download it
+
+if not os.path.exists("python.h5"):
+    print("Downloading model...")
+    response = requests.get(MODEL_URL)
+    with open("python.h5", "wb") as file:
+        file.write(response.content)
+
+# Load the model
+model = load_model("python.h5")
+
 
 # Normalization function
 def normalize_input(features):
@@ -56,8 +74,6 @@ def predict():
     except Exception as e:
         print("Error occurred:", str(e))  # Debug errors
         return jsonify({"error": str(e)})
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
