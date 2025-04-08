@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AMS Prediction</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff; /* Light blue background */
+        }
+        h1 {
+            color: #4a4a4a; /* Dark grey */
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff; /* White background for form */
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333333; /* Dark grey for labels */
+        }
+
+        select, input[type="text"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc; /* Light grey border */
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        input[type="submit"] {
+            background-color: #007BFF; /* Blue button */
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3; /* Darker blue */
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9; /* Light grey for result box */
+            font-size: 18px;
+            font-weight: bold;
+            color: #4a4a4a; /* Dark grey */
+        }
+    </style>
+</head>
+<body>
+    <h1>AMS Prediction App</h1>
+    <div class="container">
+        <form id="amsForm" action="/predict" method="post">
+            <div class="form-group">
+                <label for="Ort_transformed">Height (meters):</label>
+                <input type="text" id="Ort_transformed" name="Ort_transformed" required>
+            </div>
+
+            <div class="form-group">
+                <label for="guide_transformed">Guide Transformed:</label>
+                <select id="guide_transformed" name="guide_transformed" required>
+                    <option value="0">No guide</option>
+                    <option value="0.5">Partial guide</option>
+                    <option value="1">Complete guide</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="gender_transformed">Gender:</label>
+                <select id="gender_transformed" name="gender_transformed" required>
+                    <option value="0">Man</option>
+                    <option value="1">Woman</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="age_transformed">Age:</label>
+                <input type="text" id="age_transformed" name="age_transformed" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Slow_transformed">Slow Transformed:</label>
+                <select id="Slow_transformed" name="Slow_transformed" required>
+                    <option value="0">Fast</option>
+                    <option value="1">Slow</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="Pre_acclimatization_transformed">Pre-acclimatization:</label>
+                <select id="Pre_acclimatization_transformed" name="Pre_acclimatization_transformed" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="Knowledge_score_transformed">Knowledge Score:</label>
+                <input type="text" id="Knowledge_score_transformed" name="Knowledge_score_transformed" required>
+            </div>
+
+            <div class="form-group">
+                <label for="AMS_history">AMS History:</label>
+                <select id="AMS_history" name="AMS_history" required>
+                    <option value="0">Not assessible</option>
+                    <option value="0.5">No history</option>
+                    <option value="1">History</option>
+                </select>
+            </div>
+
+            <input type="submit" value="Predict AMS">
+        </form>
+        <div id="result" class="result">
+            <!-- The prediction result will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('amsForm');
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent form from reloading the page
+
+            const formData = new FormData(form);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const resultDiv = document.getElementById('result');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.probability) {
+                    resultDiv.innerHTML = `<p>The probability of AMS occurrence is: <strong>${data.probability}</strong></p>`;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Prediction failed. Please check your inputs.</p>`;
+                }
+            } else {
+                resultDiv.innerHTML = `<p style="color: red;">An error occurred while predicting AMS. Please try again.</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
